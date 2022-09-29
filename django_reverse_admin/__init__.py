@@ -317,7 +317,11 @@ class ReverseModelAdmin(ModelAdmin):
                                       )
         media = self.media + adminForm.media
 
-        inline_admin_formsets = self.get_inline_formsets(request, formsets, self.get_inline_instances(request), obj)
+        inline_instances = self.get_inline_instances(request)
+        if len(inline_instances) > len(formsets):
+            # HACK For POST if form is not valid and there are also normal inlines
+            inline_instances = [i for i in inline_instances if i not in self.tmp_inline_instances]
+        inline_admin_formsets = self.get_inline_formsets(request, formsets, inline_instances, obj)
         for inline_formset in inline_admin_formsets:
             media = media + inline_formset.media
 
